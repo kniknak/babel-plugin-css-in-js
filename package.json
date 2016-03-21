@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-css-in-js",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "A plugin for Babel v6 which transforms inline styles defined in JavaScript modules into class names so they become available to, e.g. the `className` prop of React elements. While transforming, the plugin processes all JavaScript style definitions found and bundles them up into a CSS file, ready to be requested from your web server.",
   "main": "lib/index.js",
   "keywords": [
@@ -9,16 +9,16 @@
     "stylesheet",
     "bundler"
   ],
-  "author": "Martin Andert",
+  "author": "Georgy Devyatkin",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/martinandert/babel-plugin-css-in-js.git"
+    "url": "git+https://github.com/kniknak/babel-plugin-css-in-js.git"
   },
   "bugs": {
-    "url": "https://github.com/martinandert/babel-plugin-css-in-js/issues"
+    "url": "https://github.com/kniknak/babel-plugin-css-in-js/issues"
   },
-  "homepage": "https://github.com/martinandert/babel-plugin-css-in-js#readme",
+  "homepage": "https://github.com/kniknak/babel-plugin-css-in-js#readme",
   "engines": {
     "node": ">=0.12"
   },
