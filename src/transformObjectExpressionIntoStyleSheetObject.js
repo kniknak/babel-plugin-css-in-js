@@ -81,7 +81,14 @@ function canEvaluate(expr, context) {
     return t.isIdentifier(expr.property) && canEvaluate(expr.object, context);
   } else if (t.isBinaryExpression(expr)) {
     return canEvaluate(expr.left, context) && canEvaluate(expr.right, context);
+  } else if (t.isCallExpression(expr)) {
+    return context.hasOwnProperty(expr.callee.object.name) &&
+        (typeof context[expr.callee.object.name] === "object") &&
+        context[expr.callee.object.name].hasOwnProperty(expr.callee.property.name) &&
+        (typeof context[expr.callee.object.name][expr.callee.property.name] === "function") &&
+        expr.arguments.reduce(function(result, expr) {return result && canEvaluate(expr, context)}, true)
   }
+
 
   return false;
 }
