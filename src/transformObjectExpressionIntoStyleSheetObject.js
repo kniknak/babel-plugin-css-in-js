@@ -4,7 +4,8 @@ import extend from 'object-assign';
 import { types as t } from 'babel-core';
 import generate from 'babel-generator';
 
-const isBlank = /^\s*$/;
+const isBlank = /^\s*$/
+
 
 export default function transformObjectExpressionIntoStyleSheetObject(expr, context) {
   assert(t.isObjectExpression(expr), 'must be a object expression');
@@ -25,7 +26,7 @@ export default function transformObjectExpressionIntoStyleSheetObject(expr, cont
 }
 
 function processTopLevelProperty(key, value, result, context) {
-  const name = keyToName(key);
+  const name = keyToName(key, context);
 
   assert(t.isObjectExpression(value), 'top-level value must be a object expression');
 
@@ -41,11 +42,10 @@ function processProperties(properties, result, context) {
 }
 
 function processProperty(key, value, result, context) {
-  const name = keyToName(key);
+  const name = keyToName(key, context);
 
   if (canEvaluate(value, context)) {
     const val = context.evaluate(value);
-
     assert(typeof val === 'string' || typeof val === 'number', 'value must be a string or number');
 
     if (typeof val === 'string') {
@@ -62,14 +62,18 @@ function processProperty(key, value, result, context) {
 
     result[name] = -value.argument.value;
   } else {
+      console.log(value)
     assert(false, 'invalid value expression type');
   }
 }
 
-function keyToName(key) {
-  assert(t.isIdentifier(key) || t.isLiteral(key) && typeof key.value === 'string', 'key must be a string or identifier');
-
-  return key.name || key.value;
+function keyToName(key, context) {
+    if (t.isIdentifier(key) || t.isLiteral(key) && typeof key.value === 'string') {
+        return key.name || key.value;
+    } else {
+//        return context[key.object.name][key.property.name]
+        return context.evaluate(key);
+    }
 }
 
 function canEvaluate(expr, context) {
@@ -88,7 +92,6 @@ function canEvaluate(expr, context) {
         (typeof context[expr.callee.object.name][expr.callee.property.name] === "function") &&
         expr.arguments.reduce(function(result, expr) {return result && canEvaluate(expr, context)}, true)
   }
-
 
   return false;
 }

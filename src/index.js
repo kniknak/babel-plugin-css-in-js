@@ -123,13 +123,13 @@ function buildOptions(options, filename) {
   options = extend({}, DEFAULT_OPTIONS, options, { filename });
 
   if (typeof options.context === 'string') {
-    const file = resolve(options.context);
+      const file = resolve(options.context);
 
-    if (typeof contextFileCache[file] === 'undefined') {
-      contextFileCache[file] = require(file);
-    }
+      if (typeof contextFileCache[file] === 'undefined') {
+        contextFileCache[file] = require(file);
+      }
 
-    options.context = contextFileCache[file];
+      options.context = contextFileCache[file];
   }
 
   return options;
