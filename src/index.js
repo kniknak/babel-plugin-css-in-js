@@ -103,16 +103,46 @@ function visitor(context) {
 
       const gcnOptions = extend({}, this.cssInJS.options, { prefixes: [this.cssInJS.filename, sheetId] });
 
-      const properties = Object.keys(sheet).reduce((memo, styleId) => {
-        return memo.concat(
-          t.objectProperty(
-            t.identifier(styleId),
-            t.stringLiteral(generateClassName(styleId, gcnOptions))
-          )
-        );
-      }, []);
+      let map = {}
 
-      path.replaceWith(t.objectExpression(properties));
+      Object.keys(sheet).map(styleId => {
+        if (styleId.indexOf("__") < 0) {
+          map[styleId] = generateClassName(styleId, gcnOptions)
+        } else {
+          const left = styleId.split("__")[0]
+          const right = styleId.split("__")[1]
+
+          if (typeof map[left] !== "object") {
+            map[left] = {}
+          }
+
+          map[left][right] = generateClassName(styleId, gcnOptions)
+        }
+      });
+
+      const objectToAST = map => {
+        let result = []
+
+        Object.keys(map).map(key => {
+          if (typeof map[key] !== "object") {
+            result.push(t.objectProperty(
+                t.identifier(key),
+                t.stringLiteral(map[key])
+            ))
+          } else {
+            result.push(t.objectProperty(
+                t.identifier(key),
+                t.objectExpression(objectToAST(map[key]))
+            ))
+          }
+
+        })
+
+        return result
+      }
+
+
+      path.replaceWith(t.objectExpression(objectToAST(map)));
     },
   };
 }

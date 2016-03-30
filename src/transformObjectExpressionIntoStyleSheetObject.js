@@ -46,7 +46,19 @@ function processProperty(key, value, result, context) {
 
   if (canEvaluate(value, context)) {
     const val = context.evaluate(value);
-    assert(typeof val === 'string' || typeof val === 'number', 'value must be a string or number');
+/*
+    console.log(val)
+    console.log(typeof val.prototype)
+    console.log(typeof val.toString)
+    console.log(typeof val.prototype.toString)
+
+    if (typeof val.toString === "function") {
+      val = val.toString()
+    }
+
+    console.log(val)
+*/
+    assert(typeof val === 'string' || typeof val === 'number' || typeof val.toString === "function", 'value must be a string or number or has toString method');
 
     if (typeof val === 'string') {
       assert(!isBlank.test(val), 'string value cannot be blank');
@@ -85,12 +97,50 @@ function canEvaluate(expr, context) {
     return t.isIdentifier(expr.property) && canEvaluate(expr.object, context);
   } else if (t.isBinaryExpression(expr)) {
     return canEvaluate(expr.left, context) && canEvaluate(expr.right, context);
+  } else if (t.isUnaryExpression(expr)) {
+    return canEvaluate(expr.argument, context)
+  } else if (t.isArrayExpression(expr)) {
+    return expr.elements.reduce(function(result, expr) {
+      if (!canEvaluate(expr, context)) {
+        console.log(expr)
+      }
+      return result && canEvaluate(expr, context)
+    }, true)
   } else if (t.isCallExpression(expr)) {
-    return context.hasOwnProperty(expr.callee.object.name) &&
-        (typeof context[expr.callee.object.name] === "object") &&
-        context[expr.callee.object.name].hasOwnProperty(expr.callee.property.name) &&
-        (typeof context[expr.callee.object.name][expr.callee.property.name] === "function") &&
-        expr.arguments.reduce(function(result, expr) {return result && canEvaluate(expr, context)}, true)
+  /*  if (expr.callee.object === "undefined") {
+      console.log(expr)
+      assert(false, "invalid expr.callee.object")
+      return false
+    }
+
+    if (typeof context[expr.callee.object.name] !== "object") {
+      console.log("expression: ",  expr)
+      console.log("context: ", context)
+      assert(false, "context." + expr.callee.object.name + " is not defined")
+      return false
+    }
+
+    if (context[expr.callee.object.name].hasOwnProperty(expr.callee.property.name) === undefined) {
+      console.log("expression: ",  expr)
+      console.log("context." + expr.callee.object.name + ": ", context[expr.callee.object.name])
+      assert(false, "context." + expr.callee.object.name + "." + expr.callee.property.name + " is not defined")
+      return false
+    }
+
+    if (typeof context[expr.callee.object.name][expr.callee.property.name] !== "function") {
+      console.log("expression: ",  expr)
+      console.log("context." + expr.callee.object.name + "." + expr.callee.property.name + ": ", context[expr.callee.object.name][expr.callee.property.name])
+      assert(false, "context." + expr.callee.object.name + "." + expr.callee.property.name + " is not a function")
+      return false
+    }
+
+    if (!expr.arguments.reduce(function(result, expr) {return result && canEvaluate(expr, context)}, true)) {
+      console.log("expr.arguments: ",  expr.arguments)
+      assert(false, "cant evaluate expr.arguments")
+      return false
+    }*/
+
+    return true
   }
 
   return false;

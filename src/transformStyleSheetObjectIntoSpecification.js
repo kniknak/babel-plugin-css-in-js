@@ -51,12 +51,20 @@ function processStyle(styles, styleName, content) {
   const style = initStyleSpec(styles, styleName);
 
   foreach(content, (value, key) => {
+      if (value.toString() !== "[object Object]") {
+          value = value.toString()
+      }
+
     if (isMediaQueryDeclaration.test(key)) {
       processStyleAndMediaQuery(styles, styleName, key.substring(1), value);
     } else if (isStandaloneSelector.test(key)) {
       processStyleAndSelector(styles, styleName, key, value);
     } else if (hasAttachedSelector.test(key)) {
       assert(false, 'styles cannot be nested into each other');
+    } else if (isPlainObject(value)) {
+      Object.keys(value).map(selectorName => {
+          processStyle(styles, styleName + "__" + key, value)
+      })
     } else {
       processRule(style.rules, key, value);
     }
@@ -70,6 +78,10 @@ function processStyleAndMediaQuery(styles, styleName, mediaQueryName, content) {
   const mediaQuery = initMediaQuerySpec(style.mediaQueries, mediaQueryName);
 
   foreach(content, (value, key) => {
+    if (value.toString() !== "[object Object]") {
+      value = value.toString()
+    }
+
     if (isMediaQueryDeclaration.test(key)) {
       assert(false, 'media queries cannot be nested into each other');
     } else if (isStandaloneSelector.test(key)) {
@@ -89,6 +101,10 @@ function processStyleAndSelector(styles, styleName, selectorName, content) {
   const selector = initSelectorSpec(style.selectors, selectorName);
 
   foreach(content, (value, key) => {
+      if (value.toString() !== "[object Object]") {
+          value = value.toString()
+      }
+
     if (isMediaQueryDeclaration.test(key)) {
       assert(false, 'media queries cannot be nested into selectors');
     } else if (isStandaloneSelector.test(key)) {
@@ -109,6 +125,10 @@ function processStyleAndMediaQueryAndSelector(styles, styleName, mediaQueryName,
   const selector = initSelectorSpec(mediaQuery.selectors, selectorName);
 
   foreach(content, (value, key) => {
+    if (value.toString() !== "[object Object]") {
+      value = value.toString()
+    }
+
     if (isMediaQueryDeclaration.test(key)) {
       assert(false, 'media queries cannot be nested into each other');
     } else if (isStandaloneSelector.test(key)) {
