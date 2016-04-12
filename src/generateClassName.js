@@ -16,9 +16,8 @@ export default function generateClassName(id, options) {
 
   result = result
       .replace("modules_", "")
-      .replace("dist-server_", "")
-      .replace("es6-server_", "")
       .replace("server_", "")
+      .replace("tmp_", "")
       .replace("_tsx-", "-")
       .replace("_jsx-", "-")
       .replace("_js-", "-")
