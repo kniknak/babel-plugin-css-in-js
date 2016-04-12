@@ -14,6 +14,15 @@ export default function generateClassName(id, options) {
 
   result += id;
 
+  result = result
+      .replace("modules_", "")
+      .replace("dist-server_", "")
+      .replace("es6-server_", "")
+      .replace("server_", "")
+      .replace("_tsx-", "-")
+      .replace("_jsx-", "-")
+      .replace("_js-", "-")
+      .replace("_ts-", "-")
   if (options.compressClassNames) {
     const [className, selector] = splitSelector(result);
     return compressClassName(className, options) + selector;
